@@ -1,0 +1,116 @@
+/* General Body Styles */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Modern font */
+    margin: 0;
+    padding: 0;
+    background-color: #353030; /* Dark background */
+    color: #ffffff; /* White text */
+}
+
+/* Headings */
+h1, h2 {
+    color: #0eb147; /* Spotify green for headings */
+}
+
+/* Navigation Styles */
+nav {
+    background-color: #282828; /* Dark gray for navigation */
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space out elements */
+}
+
+.nav-logo {
+    height: 40px;
+}
+
+.nav-title {
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    position: relative;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #b3b3b3; /* Light gray for links */
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #1DB954; /* Spotify green on hover */
+}
+
+/* Section Styles */
+section {
+    padding: 20px;
+    margin: 20px;
+    background-color: #181818; /* Slightly lighter gray for sections */
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* More prominent shadow */
+}
+
+/* Charts and Map Styles */
+#growth-chart, #map {
+    height: 400px;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #282828; /* Dark gray footer */
+    color: #b3b3b3; /* Light gray text */
+    text-align: center;
+    padding: 10px;
+}
+
+/* Responsive Styles */
+@media only screen and (max-width: 600px) {
+    nav ul {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Additional Styles for Interactivity */
+button {
+    background-color: #1DB954; /* Spotify green */
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #1aa34a; /* Darker green on hover */
+}
+
+input[type="text"], input[type="number"] {
+    padding: 10px;
+    border: 1px solid #b3b3b3; /* Light gray border */
+    border-radius: 25px;
+    background-color: #282828; /* Dark input background */
+    color: #ffffff; /* White text */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="number"]:focus {
+    outline: none;
+    border-color: #1DB954; /* Green border on focus */
+}

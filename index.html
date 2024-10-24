@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microbial Growth Prediction</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .assistant-button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .assistant-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+    </style>
+    <script>
+        // Function to create the growth chart
+        function createGrowthChart(temperature, growth, humidity) {
+            const trace1 = {
+                x: temperature,
+                y: growth,
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'Pathogen Growth',
+                marker: { size: 10, color: 'blue' },
+                line: { color: 'blue' }
+            };
+            const trace2 = {
+                x: temperature,
+                y: humidity,
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'Humidity',
+                marker: { size: 10, color: 'green' },
+                line: { color: 'green' }
+            };
+            const data = [trace1, trace2];
+    
+            const layout = {
+                title: 'Temperature vs. Pathogen Growth and Humidity',
+                xaxis: { title: 'Temperature (°C)' },
+                yaxis: { title: 'Growth (%) / Humidity (%)' },
+                showlegend: true
+            };
+    
+            Plotly.newPlot('growth-chart', data, layout);
+        }
+    
+        // Function to fetch data from the backend and update the chart and alerts
+        function fetchDataAndUpdateUI() {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    const { temperature, humidity, growth, mse, risk_level, recommendation } = data;
+    
+                    // Update the chart with new data
+                    createGrowthChart(temperature, growth, humidity);
+    
+                    // Update the MSE value
+                    document.getElementById('mse').textContent = mse.toFixed(2);
+    
+                    // Update the risk level and recommended actions
+                    document.getElementById('risk-level').textContent = risk_level;
+                    document.getElementById('actions').textContent = recommendation;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+    
+        // Function to initialize the chart and set intervals for real-time updates
+        function initializeRealTimeUpdates() {
+            fetchDataAndUpdateUI(); // Initial fetch and chart creation
+    
+            // Fetch data and update the UI every 5 seconds
+            setInterval(fetchDataAndUpdateUI, 5000);
+        }
+    
+        // Initialize the chart and UI on page load
+        window.onload = function() {
+            initializeRealTimeUpdates();
+        };
+    </script>
+    
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+    // Function to create the growth chart
+    function createGrowthChart(temperature, growth, humidity) {
+        const trace1 = {
+            x: temperature,
+            y: growth,
+            mode: 'markers+lines',
+            type: 'scatter',
+            name: 'Pathogen Growth',
+            marker: { size: 10, color: 'blue' },
+            line: { color: 'blue' }
+        };
+        const trace2 = {
+            x: temperature,
+            y: humidity,
+            mode: 'markers+lines',
+            type: 'scatter',
+            name: 'Humidity',
+            marker: { size: 10, color: 'green' },
+            line: { color: 'green' }
+        };
+        const data = [trace1, trace2];
+
+        const layout = {
+            title: 'Temperature vs. Pathogen Growth and Humidity',
+            xaxis: { title: 'Temperature (°C)' },
+            yaxis: { title: 'Growth (%) / Humidity (%)' },
+            showlegend: true
+        };
+
+        Plotly.newPlot('growth-chart', data, layout);
+    }
+
+    // Function to fetch data from the Flask backend
+    function fetchDataAndUpdateChart() {
+        fetch('/api/data')
+            .then(response => response.json())
+            .then(data => {
+                const { temperature, humidity, growth, mse } = data;
+
+                // Update the chart with new data
+                createGrowthChart(temperature, growth, humidity);
+
+                // Update the MSE value
+                document.getElementById('mse').textContent = mse.toFixed(2);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Function to initialize the chart and set intervals for real-time updates
+    function initializeRealTimeUpdates() {
+        fetchDataAndUpdateChart(); // Initial fetch and chart creation
+
+        // Fetch data and update the chart every 5 seconds
+        setInterval(fetchDataAndUpdateChart, 5000);
+    }
+
+    // Initialize the chart and display MSE on page load
+    window.onload = function() {
+        initializeRealTimeUpdates();
+    };
+</script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#analytics">Analytics</a></li>
+            <li><a href="#realtime">Real-Time Data</a></li>
+            <li><a href="#recommendations">Recommendations</a></li>
+        </ul>
+    </nav>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard">
+        <h1>Microbial Growth Dashboard</h1>
+        <div id="growth-chart" style="width: 100%; height: 400px;"></div>
+        <div id="stats">
+            <p>Predicted Pathogen Growth: <span id="prediction"></span></p>
+            <p>Genomic Data: <span id="genomic-data"></span></p>
+            <p>Environmental Conditions: <span id="env-status"></span></p>
+            <p>Mean Squared Error: <span id="mse"></span></p> <!-- MSE Display -->
+        </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section id="analytics">
+        <h2>Pathogen Growth Analytics</h2>
+        <div id="map"></div>
+    </section>
+
+    <!-- Real-Time Data Section -->
+    <section id="realtime">
+        <a href="https://you.com/?chatMode=user_mode_23d37012-fda0-4a43-86b3-068d7cb620df" target="_blank" class="assistant-button">I'm Your Assistant</a><p>This is chatbot that help you to clear your doubts about food safety </p>
+    </section>
+    <script>
+        // Sample Risk Level Data (This could be calculated dynamically based on your data)
+        const riskLevel = 'Low';  // Example risk level ('Low', 'Moderate', 'High')
+        
+        // Function to determine recommended actions based on the risk level
+        function getRecommendations(riskLevel) {
+            let recommendations = '';
+    
+            switch(riskLevel) {
+                case 'Low':
+                    recommendations = 'Continue monitoring. No immediate actions needed.';
+                    break;
+                case 'Moderate':
+                    recommendations = 'Monitor environmental conditions closely. Consider sanitizing affected areas.';
+                    break;
+                case 'High':
+                    recommendations = 'Immediate action required! Isolate affected areas and increase sanitation efforts.';
+                    break;
+                default:
+                    recommendations = 'No recommendations available.';
+            }
+    
+            return recommendations;
+        }
+    
+        // Function to display Risk Level and Recommendations
+        function displayAlerts() {
+            document.getElementById('risk-level').textContent = riskLevel;
+            document.getElementById('actions').textContent = getRecommendations(riskLevel);
+        }
+    
+        // Call the function on page load
+        window.onload = function() {
+            displayAlerts();
+        };
+    </script>
+    <!-- Recommendations Section -->
+    <section id="recommendations">
+        <h2>Alerts & Recommendations</h2>
+        <div id="alerts">
+            <p>Risk Level: <span id="risk-level"></span></p>
+            <p>Recommended Actions: <span id="actions"></span></p>
+        </div>
+    </section>
+    <section >
+        <h2>TIPS </h2>
+        <div>
+            <h2>Precautions for Preventing Microbial Growth</h2>
+            <p><strong>1. Maintain Cleanliness:</strong> 
+                <br>Regular Cleaning: Use appropriate cleaning agents to regularly clean surfaces, equipment, and tools to remove dirt and biofilms where microbes can thrive. 
+                <br>Sanitization: After cleaning, use sanitizers to kill any remaining microorganisms. Common sanitizers include chlorine bleach, alcohol solutions, and hydrogen peroxide.
+            </p>
+            <p><strong>2. Control Temperature:</strong> 
+                <br>Refrigeration: Store perishable foods and biological samples in refrigerators or freezers to slow down microbial growth. Ideal refrigerator temperatures are typically below 40°F (4°C). 
+                <br>Heat Treatment: Cooking food to safe internal temperatures (e.g., 165°F or 74°C for poultry) kills many harmful microbes.
+            </p>
+            <p><strong>3. Regulate Humidity:</strong> 
+                <br>Moisture Control: Keep humidity levels low in storage areas, as many microbes thrive in moist environments. Use dehumidifiers if necessary. 
+                <br>Drying Techniques: Consider drying foods and materials (like herbs) to inhibit microbial growth.
+            </p>
+            <p><strong>4. Proper Storage:</strong> 
+                <br>Airtight Containers: Use airtight containers to limit exposure to air and contaminants. This is especially important for dry foods and biological samples. 
+                <br>Labeling: Clearly label containers with dates and contents to ensure proper use and reduce the risk of using expired materials.
+            </p>
+            <p><strong>5. Hygienic Practices:</strong> 
+                <br>Hand Hygiene: Encourage regular handwashing with soap and water, especially in food preparation and healthcare settings. 
+                <br>Protective Gear: Use gloves, masks, and gowns when handling biological materials or in environments where microbial contamination is a concern.
+            </p>
+            <p><strong>6. Implement Good Manufacturing Practices (GMP):</strong> 
+                <br>Quality Control: In food and pharmaceutical industries, follow GMP to minimize the risk of contamination during production. 
+                <br>Routine Inspections: Regularly inspect production facilities for cleanliness and microbial contamination.
+            </p>
+            <p><strong>7. Use of Preservatives:</strong> 
+                <br>Food Preservatives: Consider using natural preservatives (like vinegar, salt, or sugar) or chemical preservatives (like sodium benzoate or potassium sorbate) to inhibit microbial growth in foods.
+            </p>
+            <p><strong>8. Educate Staff and Stakeholders:</strong> 
+                <br>Training: Provide training for staff on hygiene practices, microbial risks, and prevention strategies. 
+                <br>Awareness Campaigns: Educate consumers about proper food handling, storage, and preparation practices.
+            </p>
+            <p><strong>9. Monitor and Test for Microbial Presence:</strong> 
+                <br>Routine Testing: Implement regular testing of surfaces, equipment, and food products for microbial contamination to identify problems early. 
+                <br>Environmental Monitoring: Use environmental monitoring systems in food production areas to track microbial counts.
+            </p>
+            <p><strong>10. Limit Cross-Contamination:</strong> 
+                <br>Separate Equipment: Use separate utensils and equipment for raw and cooked foods to prevent cross-contamination. 
+                <br>Zoning: In laboratories, create designated zones for different types of work (e.g., clean and dirty areas) to minimize the risk of contamination.
+            </p>
+        </div>
+        
+    </section>
+
+    <footer>
+        <p>Developed by DevPals </p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        // Data for plotting
+        const temperature = [25.618102, 34.260715, 30.979909, 28.979877, 22.340280];
+        const humidity = [51.257167, 75.456416, 62.574239, 70.342828, 86.302659];
+        const growth = [21.050791, 7.103499, 9.040718, 27.463855, 20.160726];
+        
+        // Mean Squared Error (Example Value)
+        const mseValue = 137.7228108403528;
+
+        // Function to create the growth chart
+        function createGrowthChart() {
+            const trace1 = {
+                x: temperature,
+                y: growth,
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'Pathogen Growth',
+                marker: { size: 10, color: 'blue' },
+                line: { color: 'blue' }
+            };
+            const trace2 = {
+                x: temperature,
+                y: humidity,
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'Humidity',
+                marker: { size: 10, color: 'green' },
+                line: { color: 'green' }
+            };
+            const data = [trace1, trace2];
+
+            const layout = {
+                title: 'Temperature vs. Pathogen Growth and Humidity',
+                xaxis: { title: 'Temperature (°C)' },
+                yaxis: { title: 'Growth (%) / Humidity (%)' },
+                showlegend: true
+            };
+
+            Plotly.newPlot('growth-chart', data, layout);
+        }
+
+        // Function to display MSE
+        function displayMSE() {
+            document.getElementById('mse').textContent = mseValue.toFixed(2);
+        }
+
+        // Initialize the chart and display MSE on page load
+        window.onload = function() {
+            createGrowthChart();
+            displayMSE();
+        };
+    </script>
+        
+</body>
+</html>
